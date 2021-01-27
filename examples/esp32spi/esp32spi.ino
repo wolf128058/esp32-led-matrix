@@ -2,7 +2,7 @@
 #include "LedMatrix.h"
 
 
-#define NUMBER_OF_DEVICES 3 //number of led matrix connect in series
+#define NUMBER_OF_DEVICES 4 //number of led matrix connect in series
 #define CS_PIN 15
 #define CLK_PIN 14
 #define MISO_PIN 2 //we do not use this pin just fill to match constructor
