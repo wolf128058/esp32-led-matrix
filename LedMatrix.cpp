@@ -100,9 +100,17 @@ void LedMatrix::clear() {
 }
 
 void LedMatrix::commit() {
-    for (byte col = 0; col < myNumberOfDevices * 8; col++) {
-        sendByte(col / 8, col % 8 + 1, cols[col]);
-    }
+    for (byte dev = 0; dev < myNumberOfDevices; dev++) {
+        byte m[8] = {0};
+        for (byte col = 0; col < 8; col++) {
+            byte b = cols[dev*8+col];
+            for (byte bit = 0; bit < 8; bit++) {
+                if (b & 1) m[bit] |= (128>>col); b >>= 1;
+            }
+        }
+        for (byte col = 0; col < 8; col++)
+        sendByte(dev, col + 1, m[col]); 
+    } 
 }
 
 void LedMatrix::setText(String text) {
