@@ -27,6 +27,7 @@ String message = "";
 
 //Scrolling Direction
 int direction = 0;
+byte intensity = 0;
 
 String IpAddress2String(const IPAddress& ipAddress)
 {
@@ -40,6 +41,10 @@ void dataHandler(){
   String msg = server.arg("message");   //message from POST data
   if (server.arg("direction").length() > 0) {
     direction = server.arg("direction").toInt();
+  }
+  if (server.arg("intensity").length() > 0) {
+    int int_intensity = server.arg("intensity").toInt();
+    intensity = (int)int_intensity;
   }
   message = msg;
   EEPROM.writeString(0,message);      //store received message to EEPROM
@@ -81,6 +86,7 @@ void loop() {
   ledMatrix.clear();
   server.handleClient();
   int len = message.length();
+  ledMatrix.setIntensity(intensity);
   if (len <= 100 && len > 0) {
     ledMatrix.setNextText(message);
   }
