@@ -25,6 +25,9 @@ WebServer server(80);
 //Initialize message to display
 String message = "";
 
+//Scrolling Direction
+int direction = 0;
+
 String IpAddress2String(const IPAddress& ipAddress)
 {
   return String(ipAddress[0]) + String(".") +\
@@ -35,6 +38,7 @@ String IpAddress2String(const IPAddress& ipAddress)
 
 void dataHandler(){
   String msg = server.arg("message");   //message from POST data
+  direction = server.arg("direction").toInt();  
   message = msg;
   EEPROM.writeString(0,message);      //store received message to EEPROM
   EEPROM.commit();                    //commit the save
@@ -78,7 +82,17 @@ void loop() {
   if (len <= 100 && len > 0) {
     ledMatrix.setNextText(message);
   }
-  ledMatrix.scrollTextLeft();
+  switch (direction) {
+    case 1:
+      ledMatrix.scrollTextRight();
+      break;
+    case 2:
+      ledMatrix.oscillateText();
+      break;
+    default:
+      ledMatrix.scrollTextLeft();
+      break;
+  }
   ledMatrix.drawText();
   ledMatrix.commit();
   delay(50);
