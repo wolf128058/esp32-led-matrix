@@ -38,7 +38,9 @@ String IpAddress2String(const IPAddress& ipAddress)
 
 void dataHandler(){
   String msg = server.arg("message");   //message from POST data
-  direction = server.arg("direction").toInt();  
+  if (server.arg("direction").length() > 0) {
+    direction = server.arg("direction").toInt();
+  }
   message = msg;
   EEPROM.writeString(0,message);      //store received message to EEPROM
   EEPROM.commit();                    //commit the save
