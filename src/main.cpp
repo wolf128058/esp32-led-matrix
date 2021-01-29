@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
+#include "arduino_ota_update.h"
+
 #include <WebServer.h>
 #include <HTTP_Method.h>
 
@@ -9,8 +11,14 @@
 
 #include <WiFi.h>
 #include <WiFiClient.h>
-const char ssid[] = "Freifunk"; // WiFi name
-const char password[] = ""; // WiFi password
+
+//hostname
+#define HOSTNAME "MatrixWall"
+#define OTA_PASS_HASH "c4267c48649a272644e23149ecbed632"
+#define WIFI_SSID "Freifunk"
+#define WIFI_PASS ""
+#define WIFI_TIMEOUT 10000
+#define WIFI_DELAY 500
 
 #define NUMBER_OF_DEVICES 4 //number of led matrix connect in series
 #define CS_PIN 15
@@ -64,10 +72,17 @@ void setup() {
   ledMatrix.setText("Connecting ...");
   WiFi.mode(WIFI_STA);
   //Initiate WiFi Connection
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  int timeout = 0;
+  while (WiFi.status() != WL_CONNECTED && timeout <= WIFI_TIMEOUT)
+  {
+      timeout += WIFI_DELAY;
+      delay_with_ota(WIFI_DELAY);
+      Serial.print("O");
   }
+
+  setup_arduino_ota(HOSTNAME, OTA_PASS_HASH);
+
   ledMatrix.setNextText("Connected to Freifunk");
   ledMatrix.setNextText(IpAddress2String(WiFi.localIP()));
   server.on("/data",HTTP_POST,dataHandler);
@@ -104,5 +119,6 @@ void loop() {
   }
   ledMatrix.drawText();
   ledMatrix.commit();
+  ArduinoOTA.handle();
   delay(50);
 }
