@@ -10,10 +10,10 @@ Demo 5: How to use Arduino ESP32 to display information on SPI LED matrix
 http://www.iotsharing.com/2017/05/how-to-use-arduino-esp32-to-display-spi-led-matrix.html
 
 
-== install platform io
+### install platform io
 ```pip install -U platformio```
 oder in vscode die extension
-== compile with platform io
+### compile with platform io
 ```pio run```
-== compile with platform io
+### compile with platform io
 ```pio run -t upload```
