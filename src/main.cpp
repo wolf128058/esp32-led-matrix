@@ -3,13 +3,23 @@
 
 #include "arduino_ota_update.h"
 
-#include <WebServer.h>
-#include <HTTP_Method.h>
-
 #include <SPI.h>
 #include "LedMatrix.h"
 
+#ifdef ESP8266
+#include <ESP8266WiFi.h>
+#else
 #include <WiFi.h>
+#endif
+
+#ifdef ESP8266
+#include <ESP8266WebServer.h>
+#define WebServer ESP8266WebServer
+#else
+#include <WebServer.h>
+#include <HTTP_Method.h>
+#endif
+
 #include <WiFiClient.h>
 
 //hostname
@@ -46,6 +56,25 @@ String IpAddress2String(const IPAddress& ipAddress)
   String(ipAddress[3])  ;
 }
 
+void writeStringToEEPROM(int addrOffset, const String &strToWrite)
+{
+  byte len = strToWrite.length();
+  for (int i = 0; i < len; i++)
+  {
+    EEPROM.write(addrOffset + i, strToWrite[i]);
+  }
+}
+
+String readStringFromEEPROM(int addrOffset)
+{
+  String read;
+  while (read.length() == 0 || read[read.length() -1] != 0)
+  {
+    read[read.length()] = EEPROM.read(addrOffset + read.length());
+  }
+  return read;
+}
+
 void dataHandler(){
   String msg = server.arg("message");   //message from POST data
   if (server.arg("direction").length() > 0) {
@@ -56,7 +85,7 @@ void dataHandler(){
     intensity = (int)int_intensity;
   }
   message = msg;
-  EEPROM.writeString(0,message);      //store received message to EEPROM
+  writeStringToEEPROM(0,message);      //store received message to EEPROM
   EEPROM.commit();                    //commit the save
   server.send(200);                   //redirect http code
 }
@@ -64,10 +93,14 @@ void dataHandler(){
 void setup() {
   //This uses EEPROM to store previous message
   //Initialize EEPROM
+  #ifdef ESP8266
+  EEPROM.begin(4095);
+  #else
   if (!EEPROM.begin(1000)) {
     delay(1000);
     ESP.restart();
   }
+  #endif
   ledMatrix.init();
   ledMatrix.setText("Connecting ...");
   WiFi.mode(WIFI_STA);
@@ -89,7 +122,7 @@ void setup() {
   server.begin();
   ledMatrix.setNextText("Webserver on: " + IpAddress2String(WiFi.localIP()));
   //At first start, read previous message from EEPROM
-  message = EEPROM.readString(0);
+  message = readStringFromEEPROM(0);
   int len = message.length();
   if (len > 0) {
       ledMatrix.setNextText(message);
