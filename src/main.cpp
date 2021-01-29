@@ -78,7 +78,6 @@ void setup() {
   {
       timeout += WIFI_DELAY;
       delay_with_ota(WIFI_DELAY);
-      Serial.print("O");
   }
 
   setup_arduino_ota(HOSTNAME, OTA_PASS_HASH);
