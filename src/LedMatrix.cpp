@@ -20,8 +20,13 @@ LedMatrix::LedMatrix(byte numberOfDevices, int8_t sck, int8_t miso, int8_t mosi,
  */
 void LedMatrix::init() {
     pinMode(mySlaveSelectPin, OUTPUT);
-    
-    SPI.begin ( _sck,  _miso,  _mosi,  mySlaveSelectPin);
+
+    #ifdef ESP8266
+    SPI.pins(_sck,  _miso,  _mosi,  mySlaveSelectPin);
+    SPI.begin();
+    #else
+    SPI.begin( _sck,  _miso,  _mosi,  mySlaveSelectPin);
+    #endif
     SPI.setDataMode(SPI_MODE0);
     SPI.setClockDivider(SPI_CLOCK_DIV128);
     for(byte device = 0; device < myNumberOfDevices; device++) {
