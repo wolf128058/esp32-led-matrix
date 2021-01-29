@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/wolf128058/esp32-led-matrix.svg?branch=master)](https://travis-ci.com/wolf128058/esp32-led-matrix)
+
 visit IOTSHARING.COM for more
 
 This library is only for MAX7219.
