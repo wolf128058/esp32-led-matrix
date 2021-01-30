@@ -20,10 +20,15 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
     else
     {
         // Überprüfen der Firmwareversion des programmms aud dem Server
-        HTTPClient http;
-        WiFiClient client;
         int firmwareVersionNew = 0;
+        HTTPClient http;
+        #ifdef ESP8266
+        http.begin(config.check_url);     // Webseite aufrufen
+        #else
+        WiFiClient client;
+        http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
         http.begin(client, config.check_url);     // Webseite aufrufen
+        #endif
         int httpCode = http.GET();            // Antwort des Servers einlesen
         if (httpCode == HTTP_CODE_OK)         // Wenn Antwort OK
         {
