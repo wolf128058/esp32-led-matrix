@@ -14,6 +14,8 @@
 #   < https://docs.platformio.org/page/userguide/cmd_ci.html >
 #
 
+if: tag IS blank 
+
 language: python
 python:
     - "3.8"
