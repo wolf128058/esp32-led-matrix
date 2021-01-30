@@ -21,6 +21,7 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
     {
         // Überprüfen der Firmwareversion des programmms aud dem Server
         HTTPClient http;
+        WiFiClient client;
         int firmwareVersionNew = 0;
         http.begin(config.check_url);     // Webseite aufrufen
         int httpCode = http.GET();            // Antwort des Servers einlesen
@@ -43,7 +44,6 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
             t_httpUpdate_return ret = ESPhttpUpdate.update(config.binary_url);
             #else
             httpUpdate.rebootOnUpdate(false);// reboot abschalten, wir wollen erst Meldungen ausgeben
-            WiFiClient client;
             t_httpUpdate_return ret = httpUpdate.update( client, config.binary_url );
             #endif
             switch (ret)
