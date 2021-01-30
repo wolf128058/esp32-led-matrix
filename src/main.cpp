@@ -112,6 +112,7 @@ void dataHandler(){
 }
   
 void setup() {
+  Serial.begin(115200);
   ledMatrix.init();
   ledMatrix.setText("Connecting ...");
   WiFi.mode(WIFI_STA);
