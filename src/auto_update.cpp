@@ -30,6 +30,10 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
             String payload = http.getString();  // Webseite einlesen
             firmwareVersionNew = payload.toInt();      // Zahl aus Sting bilden
         }
+        else
+        {
+            Serial.println("Version file not found. " + String(httpCode));
+        }
         http.end();
 
         if (firmwareVersionNew > config.version)        // Firmwareversion mit aktueller vergleichen
