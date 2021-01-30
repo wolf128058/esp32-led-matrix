@@ -38,8 +38,14 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
                 Serial.println("Neue Firmware verfuegbar");
                 Serial.println("Starte Download");
             }
+            #ifdef ESP8266
             ESPhttpUpdate.rebootOnUpdate(false);// reboot abschalten, wir wollen erst Meldungen ausgeben
             t_httpUpdate_return ret = ESPhttpUpdate.update(config.binary_url);
+            #else
+            httpUpdate.rebootOnUpdate(false);// reboot abschalten, wir wollen erst Meldungen ausgeben
+            WiFiClient client;
+            t_httpUpdate_return ret = httpUpdate.update( client, config.binary_url );
+            #endif
             switch (ret)
             {
                 case HTTP_UPDATE_OK:
@@ -55,12 +61,20 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
                         Serial.flush();
                     }
                     delay(1);
+                    #ifdef ESP8266
                     ESP.reset();
+                    #else
+                    ESP.restart();
+                    #endif
                     delay(100);
                     break;
                 default:
                     if (config.debug)
+                    #ifdef ESP8266
                     Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+                    #else
+                    Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", httpUpdate.getLastError(), httpUpdate.getLastErrorString().c_str());
+                    #endif
                     break;
             }
         }

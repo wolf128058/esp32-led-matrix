@@ -55,8 +55,6 @@ byte intensity = 0;
 
 //config
 eepromData_t cfg;
-//auto updater
-HTTPClient http;
 
 void onFirmwareUpdateDone(unsigned int newVersion)
 {

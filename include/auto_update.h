@@ -1,5 +1,10 @@
+#ifdef ESP8266
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
+#else
+#include <HTTPClient.h>
+#include <HTTPUpdate.h>
+#endif
 
 struct OTA_CONFIG {
     const int version;
