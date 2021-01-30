@@ -32,7 +32,7 @@
 #define WIFI_PASS ""
 #define URL_Version_Info_Default "http://github.com/wolf128058/esp32-led-matrix/releases/latest/download/version.txt"
 #define URL_Firmware_Default "http://github.com/wolf128058/esp32-led-matrix/releases/latest/download/firmware.bin"
-#define WIFI_TIMEOUT 10000
+#define WIFI_TIMEOUT 30000
 #define WIFI_DELAY 500
 
 #define NUMBER_OF_DEVICES 4 //number of led matrix connect in series
