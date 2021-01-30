@@ -22,11 +22,16 @@
 
 #include <WiFiClient.h>
 
+#include "eeprom_settings.h"
+#include "auto_update.h"
+
 //hostname
 #define HOSTNAME "MatrixWall"
 #define OTA_PASS_HASH "c4267c48649a272644e23149ecbed632"
 #define WIFI_SSID "Freifunk"
 #define WIFI_PASS ""
+#define URL_Version_Info_Default "http://releases.tbbs.me/version"
+#define URL_Firmware_Default "http://releases.tbbs.me/d1_mini.bin"
 #define WIFI_TIMEOUT 10000
 #define WIFI_DELAY 500
 
@@ -47,6 +52,19 @@ String message = "";
 //Scrolling Direction
 int direction = 0;
 byte intensity = 0;
+
+//config
+eepromData_t cfg;
+//auto updater
+HTTPClient http;
+
+void onFirmwareUpdateDone(unsigned int newVersion)
+{
+    //update was done, save new version number
+    cfg.firmwareVer = newVersion;
+    saveConfig(cfg);
+    //reboot happens after return
+}
 
 String IpAddress2String(const IPAddress& ipAddress)
 {
@@ -106,26 +124,72 @@ void dataHandler(){
     intensity = (int)int_intensity;
   }
   message = msg;
-  writeStringToEEPROM(0,message);      //store received message to EEPROM
+  writeStringToEEPROM(sizeof(eepromData_t)+1, message);      //store received message to EEPROM
   EEPROM.commit();                    //commit the save
   server.send(200);                   //redirect http code
 }
   
 void setup() {
   Serial.begin(115200);
+
+  loadConfig(cfg);
+  if (cfg.initialized != 1 || cfg.magic != 1337)
+  {
+      //not initialized
+      cfg.initialized = 1;
+      cfg.magic = 1337;
+      strncpy(cfg.SSID, WIFI_SSID, sizeof(WIFI_SSID));
+      strncpy(cfg.password, WIFI_PASS, sizeof(WIFI_PASS));
+      cfg.ota_update_enable = 1;
+      cfg.auto_update_enable = 0;
+      cfg.firmwareVer = 0;
+      strncpy(cfg.version_info_url, URL_Version_Info_Default, sizeof(URL_Version_Info_Default));
+      strncpy(cfg.version_update_url, URL_Firmware_Default, sizeof(URL_Firmware_Default));
+      strncpy(cfg.hostname, HOSTNAME, sizeof(HOSTNAME));
+      strncpy(cfg.ota_pass_hash, OTA_PASS_HASH, sizeof(OTA_PASS_HASH));
+      cfg.wifi_timeout = WIFI_TIMEOUT;
+      cfg.wifi_delay = WIFI_DELAY;
+      cfg.debug = 1;
+      saveConfig(cfg);
+  }
+
   ledMatrix.init();
   ledMatrix.setText("Connecting ...");
   WiFi.mode(WIFI_STA);
   //Initiate WiFi Connection
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  WiFi.begin(cfg.SSID, cfg.password);
   int timeout = 0;
-  while (WiFi.status() != WL_CONNECTED && timeout <= WIFI_TIMEOUT)
+  while (WiFi.status() != WL_CONNECTED && timeout <= cfg.wifi_timeout)
   {
-      timeout += WIFI_DELAY;
-      delay_with_ota(WIFI_DELAY);
+      timeout += cfg.wifi_delay;
+      if (cfg.ota_update_enable)
+      {
+        delay_with_ota(cfg.wifi_delay);
+      }
+      else
+      {
+        delay(cfg.wifi_delay);
+      }
   }
 
-  setup_arduino_ota(HOSTNAME, OTA_PASS_HASH);
+  if (cfg.ota_update_enable)
+  {
+    setup_arduino_ota(cfg.hostname, cfg.ota_pass_hash);
+  }
+
+  if (cfg.auto_update_enable)
+  {
+    OTA_CONFIG ota_config = {
+      .version = cfg.firmwareVer,
+      .check_url = cfg.version_info_url,
+      .binary_url = cfg.version_update_url,
+      .debug = (bool) cfg.debug,
+    };
+
+    //only checked on startup
+    //you may want to implement some reboot trigger
+    FirmwareUpdate(ota_config, &onFirmwareUpdateDone);
+  }
 
   ledMatrix.setNextText("Connected to Freifunk");
   ledMatrix.setNextText(IpAddress2String(WiFi.localIP()));
@@ -134,7 +198,7 @@ void setup() {
   server.begin();
   ledMatrix.setNextText("Webserver on: " + IpAddress2String(WiFi.localIP()));
   //At first start, read previous message from EEPROM
-  message = readStringFromEEPROM(0);
+  message = readStringFromEEPROM(sizeof(eepromData_t)+1);
   int len = message.length();
   if (len > 0) {
       ledMatrix.setNextText(message);
@@ -163,6 +227,9 @@ void loop() {
   }
   ledMatrix.drawText();
   ledMatrix.commit();
-  ArduinoOTA.handle();
+  if (cfg.ota_update_enable)
+  {
+    ArduinoOTA.handle();
+  }
   delay(50);
 }
