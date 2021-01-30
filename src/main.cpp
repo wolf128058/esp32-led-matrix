@@ -56,22 +56,43 @@ String IpAddress2String(const IPAddress& ipAddress)
   String(ipAddress[3])  ;
 }
 
+void beginEEPROM()
+{
+  //This uses EEPROM to store previous message
+  //Initialize EEPROM
+  #ifdef ESP8266
+  EEPROM.begin(4095);
+  #else
+  if (!EEPROM.begin(1000)) {
+    delay(1000);
+    ESP.restart();
+  }
+  #endif
+}
+
 void writeStringToEEPROM(int addrOffset, const String &strToWrite)
 {
-  byte len = strToWrite.length();
+  int len = strToWrite.length();
+  beginEEPROM();
   for (int i = 0; i < len; i++)
   {
-    EEPROM.write(addrOffset + i, strToWrite[i]);
+    EEPROM.put(addrOffset + i, strToWrite[i]);
   }
+  EEPROM.put(addrOffset + strToWrite.length(), '\0');
+  EEPROM.commit();
+  EEPROM.end();
 }
 
 String readStringFromEEPROM(int addrOffset)
 {
-  String read;
-  while (read.length() == 0 || read[read.length() -1] != 0)
+  char read[1024];
+  int pos = 0;
+  beginEEPROM();
+  do
   {
-    read[read.length()] = EEPROM.read(addrOffset + read.length());
-  }
+    read[pos] = EEPROM.read(addrOffset + pos);
+  } while (read[pos++] != '\0');
+  EEPROM.end();
   return read;
 }
 
@@ -91,16 +112,6 @@ void dataHandler(){
 }
   
 void setup() {
-  //This uses EEPROM to store previous message
-  //Initialize EEPROM
-  #ifdef ESP8266
-  EEPROM.begin(4095);
-  #else
-  if (!EEPROM.begin(1000)) {
-    delay(1000);
-    ESP.restart();
-  }
-  #endif
   ledMatrix.init();
   ledMatrix.setText("Connecting ...");
   WiFi.mode(WIFI_STA);
