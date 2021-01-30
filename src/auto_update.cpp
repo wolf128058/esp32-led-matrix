@@ -23,7 +23,7 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         HTTPClient http;
         WiFiClient client;
         int firmwareVersionNew = 0;
-        http.begin(config.check_url);     // Webseite aufrufen
+        http.begin(client, config.check_url);     // Webseite aufrufen
         int httpCode = http.GET();            // Antwort des Servers einlesen
         if (httpCode == HTTP_CODE_OK)         // Wenn Antwort OK
         {
