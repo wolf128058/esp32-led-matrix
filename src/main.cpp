@@ -91,6 +91,7 @@ void dataHandler(){
 }
   
 void setup() {
+  Serial.begin(115200);
   //This uses EEPROM to store previous message
   //Initialize EEPROM
   #ifdef ESP8266
