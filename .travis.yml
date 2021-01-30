@@ -33,8 +33,7 @@ script:
 deploy:
   provider: releases
   api_key:
-    secure:
-      - "$DEMTRAVISSEINKEY"
+    secure: "$DEMTRAVISSEINTOKEN"
   file:
     - firmware.bin
   skip_cleanup: true
