@@ -124,7 +124,7 @@ void dataHandler(){
   message = msg;
   writeStringToEEPROM(sizeof(eepromData_t)+1, message);      //store received message to EEPROM
   EEPROM.commit();                    //commit the save
-  server.send(200);                   //redirect http code
+  server.send(200);                   //ok http code
 }
   
 void setup() {
