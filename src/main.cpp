@@ -134,8 +134,8 @@ void setup() {
   if (cfg.initialized != 1 || cfg.magic != 1337)
   {
       //not initialized
-      cfg.initialized = 1;
       cfg.magic = 1337;
+      cfg.initialized = 0;
       strncpy(cfg.SSID, WIFI_SSID, sizeof(WIFI_SSID));
       strncpy(cfg.password, WIFI_PASS, sizeof(WIFI_PASS));
       cfg.ota_update_enable = 1;
