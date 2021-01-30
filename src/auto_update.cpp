@@ -30,6 +30,7 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         http.begin(client, config.check_url);     // Webseite aufrufen
         #endif
         int httpCode = http.GET();            // Antwort des Servers einlesen
+        String httpLocation = http.getLocation();
         if (httpCode == HTTP_CODE_OK)         // Wenn Antwort OK
         {
             String payload = http.getString();  // Webseite einlesen
@@ -37,7 +38,9 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         }
         else
         {
-            Serial.println("Version file not found. " + String(httpCode));
+            Serial.println("Version file not found.");
+            Serial.println("HTTP-Status:   " + String(httpCode));
+            Serial.println("HTTP-Location: " + String(httpLocation));
         }
         http.end();
 
