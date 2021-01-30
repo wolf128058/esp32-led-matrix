@@ -30,8 +30,8 @@
 #define OTA_PASS_HASH "c4267c48649a272644e23149ecbed632"
 #define WIFI_SSID "Freifunk"
 #define WIFI_PASS ""
-#define URL_Version_Info_Default "http://releases.tbbs.me/version"
-#define URL_Firmware_Default "http://releases.tbbs.me/d1_mini.bin"
+#define URL_Version_Info_Default "http://github.com/wolf128058/esp32-led-matrix/releases/latest/download/version.txt"
+#define URL_Firmware_Default "http://github.com/wolf128058/esp32-led-matrix/releases/latest/download/firmware.bin"
 #define WIFI_TIMEOUT 10000
 #define WIFI_DELAY 500
 
@@ -139,7 +139,7 @@ void setup() {
       strncpy(cfg.SSID, WIFI_SSID, sizeof(WIFI_SSID));
       strncpy(cfg.password, WIFI_PASS, sizeof(WIFI_PASS));
       cfg.ota_update_enable = 1;
-      cfg.auto_update_enable = 0;
+      cfg.auto_update_enable = 1;
       cfg.firmwareVer = 0;
       strncpy(cfg.version_info_url, URL_Version_Info_Default, sizeof(URL_Version_Info_Default));
       strncpy(cfg.version_update_url, URL_Firmware_Default, sizeof(URL_Firmware_Default));
