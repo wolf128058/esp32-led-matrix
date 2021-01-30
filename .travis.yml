@@ -29,3 +29,13 @@ install:
 
 script:
     - platformio run
+
+deploy:
+  provider: releases
+  api_key:
+    secure:
+      - "$DEMTRAVISSEINKEY"
+  file:
+    - firmware.bin
+  skip_cleanup: true
+  draft: true
