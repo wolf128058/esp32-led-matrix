@@ -34,6 +34,6 @@ deploy:
   provider: releases
   api_key: "$DEMTRAVISSEINTOKEN"
   file:
-    - firmware.bin
+    - .pio/build/esp32dev/firmware.bin
   skip_cleanup: true
   draft: true
