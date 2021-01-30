@@ -189,7 +189,7 @@ void setup() {
     FirmwareUpdate(ota_config, &onFirmwareUpdateDone);
   }
 
-  ledMatrix.setNextText("Connected to Freifunk");
+  ledMatrix.setNextText("Connected to " + String(cfg.SSID));
   ledMatrix.setNextText(IpAddress2String(WiFi.localIP()));
   server.on("/data",HTTP_POST,dataHandler);
   //start web server
