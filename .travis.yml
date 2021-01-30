@@ -29,14 +29,17 @@ install:
 
 script:
     - platformio run
-    - echo $TRAVIS_BUILD_NUMBER > version
+    - echo $TRAVIS_BUILD_NUMBER > version.txt
+
+before_deploy:
+    - git tag $TRAVIS_BUILD_NUMBER
 
 deploy:
   provider: releases
   api_key: "$DEMTRAVISSEINTOKEN"
   file:
     - .pio/build/esp32dev/firmware.bin
-    - version
+    - version.txt
   skip_cleanup: true
   on:
     branch: master
