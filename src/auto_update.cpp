@@ -10,6 +10,17 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         Serial.println(buffer);
     }
 
+    //Initiate WiFi Connection
+    int mytimeout = 0;
+    int mydelay = 500;
+    int wifi_timeout = 60000;
+    while (WiFi.status() != WL_CONNECTED && mytimeout <= wifi_timeout && WiFi.localIP()[3] == 0)
+    {
+        Serial.println("Waiting for Wifi (Update)");
+        mytimeout += mydelay;
+        delay(mydelay);
+    }
+
     //no wifi - can't do
     if (WiFi.status() != WL_CONNECTED)
     {
