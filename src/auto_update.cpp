@@ -42,6 +42,15 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         #endif
         int httpCode = http.GET();            // Antwort des Servers einlesen
         String httpLocation = http.getLocation();
+        while (httpCode == HTTP_CODE_MOVED_PERMANENTLY || httpCode == HTTP_CODE_FOUND ) // Wenn Antwort Weiterleitung
+        {
+            Serial.println("Redirection to : " + httpLocation);
+            HTTPClient http;
+            http.begin(client, httpLocation);
+            httpCode = http.GET();
+            httpLocation = http.getLocation();
+        }
+
         if (httpCode == HTTP_CODE_OK)         // Wenn Antwort OK
         {
             String payload = http.getString();  // Webseite einlesen
