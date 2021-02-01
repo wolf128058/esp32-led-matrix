@@ -36,8 +36,8 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         #ifdef ESP8266
         http.begin(config.check_url);     // Webseite aufrufen
         #else
-        WiFiClient client;
-        http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+        WiFiClientSecure client;
+        client.setInsecure();
         http.begin(client, config.check_url);     // Webseite aufrufen
         #endif
         int httpCode = http.GET();            // Antwort des Servers einlesen
