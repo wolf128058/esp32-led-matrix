@@ -35,12 +35,15 @@ script:
 
 before_deploy:
     - git tag $TRAVIS_BUILD_NUMBER
+    - mv .pio/build/esp32dev/firmware.bin esp32dev.bin
+    - mv .pio/build/nodemcuv2/firmware.bin nodemcuv2.bin
 
 deploy:
   provider: releases
   api_key: "$DEMTRAVISSEINTOKEN"
   file:
-    - .pio/build/esp32dev/firmware.bin
+    - esp32dev.bin
+    - nodemcuv2.bin
     - version.txt
   skip_cleanup: true
   on:
