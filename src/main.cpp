@@ -32,7 +32,7 @@
 #define OTA_PASS_HASH "c4267c48649a272644e23149ecbed632"
 #define WIFI_SSID "Freifunk"
 #define WIFI_PASS ""
-#define URL_Version_Info_Default "https://github.com/wolf128058/esp32-led-matrix/releases/latest/download/version.txt"
+#define URL_Version_Info_Default "https://api.github.com/repos/wolf128058/esp32-led-matrix/releases/latest"
 #define URL_Firmware_Default "https://github.com/wolf128058/esp32-led-matrix/releases/latest/download/" BUILD_ENV_NAME ".bin"
 #define WIFI_TIMEOUT 30000
 #define WIFI_DELAY 500
