@@ -97,7 +97,46 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
             #else
             // Suppress Reboot on Update for beeing able to read messages first
             httpUpdate.rebootOnUpdate(false);
-            t_httpUpdate_return ret = httpUpdate.update( client, config.binary_url );
+
+            HTTPClient http;
+            #ifdef ESP8266
+            // Call Url
+            http.begin(config.binary_url);
+            #else
+            WiFiClientSecure client;
+            client.setInsecure();
+            // Call Url
+            http.begin(client, config.binary_url);
+            #endif
+
+            Serial.println("Initial Download-URL : " + String(config.binary_url));
+
+            // Read Answer
+            int httpCode = http.GET();
+            String httpLocation = http.getLocation();
+
+            Serial.println("Initial HTTP-Status : " + String(httpCode));
+
+            // Loop from Redirection to Redirection
+            while (httpCode == HTTP_CODE_MOVED_PERMANENTLY || httpCode == HTTP_CODE_FOUND )
+            {
+                Serial.println("Update Redirection to : " + httpLocation);
+                HTTPClient http;
+                #ifdef ESP8266
+                http.begin(httpLocation);
+                #else
+                http.begin(client, httpLocation);
+                #endif
+                httpCode = http.GET();
+                if (http.getLocation() != "")
+                {
+                    httpLocation = http.getLocation();
+                }
+                Serial.println("HTTP-Status for that URL: " + String(httpCode));
+            }
+
+            Serial.println("Final Location for Update : '" + httpLocation + "'");
+            t_httpUpdate_return ret = httpUpdate.update( client, httpLocation );
             #endif
             switch (ret)
             {
