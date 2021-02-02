@@ -21,6 +21,8 @@
 #endif
 
 #include <WiFiClient.h>
+#include <ArduinoJson.h>
+
 
 #include "eeprom_settings.h"
 #include "auto_update.h"
@@ -126,10 +128,10 @@ void dataHandler(){
   EEPROM.commit();                    //commit the save
   server.send(200);                   //ok http code
 }
-  
+
 void setup() {
   Serial.begin(115200);
-
+  DynamicJsonDocument doc(8192);
   loadConfig(cfg);
   if (cfg.initialized != 1 || cfg.magic != 1337)
   {

@@ -1,3 +1,4 @@
+#include <ArduinoJson.h>
 #include "auto_update.h"
 
 void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int) = NULL)
