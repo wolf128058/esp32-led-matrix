@@ -54,11 +54,13 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         if (httpCode == HTTP_CODE_OK)         // Wenn Antwort OK
         {
             String payload = http.getString();  // Webseite einlesen
+            Serial.println("Version found online: " + String(payload));
             firmwareVersionNew = payload.toInt();      // Zahl aus Sting bilden
         }
         else
         {
             Serial.println("Version file not found.");
+            Serial.println("URL:           " + String(config.check_url));
             Serial.println("HTTP-Status:   " + String(httpCode));
             Serial.println("HTTP-Location: " + String(httpLocation));
         }
@@ -68,7 +70,7 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         {
             if (config.debug)
             {
-                Serial.println("Neue Firmware verfuegbar");
+                Serial.println("Neue Firmware verfuegbar: " + String(firmwareVersionNew));
                 Serial.println("Starte Download");
             }
             #ifdef ESP8266
