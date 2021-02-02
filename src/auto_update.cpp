@@ -2,7 +2,7 @@
 
 void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int) = NULL)
 {
-    //show current version in debug
+    // Show current version in debug
     if (config.debug)
     {
         char buffer [20];
@@ -10,7 +10,7 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         Serial.println(buffer);
     }
 
-    //Initiate WiFi Connection
+    // Initiate WiFi Connection
     int mytimeout = 0;
     int mydelay = 500;
     int wifi_timeout = 60000;
@@ -21,7 +21,7 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         delay(mydelay);
     }
 
-    //no wifi - can't do
+    // No wifi - can't do update
     if (WiFi.status() != WL_CONNECTED)
     {
         if (config.debug)
@@ -30,19 +30,23 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
     }
     else
     {
-        // Überprüfen der Firmwareversion des programmms aud dem Server
+        // Check Firmware-Version on Server
         int firmwareVersionNew = 0;
         HTTPClient http;
         #ifdef ESP8266
-        http.begin(config.check_url);     // Webseite aufrufen
+        // Call Url
+        http.begin(config.check_url);
         #else
         WiFiClientSecure client;
         client.setInsecure();
-        http.begin(client, config.check_url);     // Webseite aufrufen
+        // Call Url
+        http.begin(client, config.check_url);
         #endif
-        int httpCode = http.GET();            // Antwort des Servers einlesen
+        // Read Answer
+        int httpCode = http.GET();
         String httpLocation = http.getLocation();
-        while (httpCode == HTTP_CODE_MOVED_PERMANENTLY || httpCode == HTTP_CODE_FOUND ) // Wenn Antwort Weiterleitung
+        // Loop from Redirection to Redirection
+        while (httpCode == HTTP_CODE_MOVED_PERMANENTLY || httpCode == HTTP_CODE_FOUND )
         {
             Serial.println("Redirection to : " + httpLocation);
             HTTPClient http;
@@ -55,11 +59,14 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
             httpLocation = http.getLocation();
         }
 
-        if (httpCode == HTTP_CODE_OK)         // Wenn Antwort OK
+        // If Response is OK (200)
+        if (httpCode == HTTP_CODE_OK)
         {
-            String payload = http.getString();  // Webseite einlesen
+            // Read String from Website
+            String payload = http.getString();
             Serial.println("Version found online: " + String(payload));
-            firmwareVersionNew = payload.toInt();      // Zahl aus Sting bilden
+            // Cast Integer of Payload
+            firmwareVersionNew = payload.toInt();
         }
         else
         {
@@ -70,7 +77,8 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         }
         http.end();
 
-        if (firmwareVersionNew > config.version)        // Firmwareversion mit aktueller vergleichen
+        // Compare Fimware-Version online with local one
+        if (firmwareVersionNew > config.version)
         {
             if (config.debug)
             {
@@ -78,10 +86,12 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
                 Serial.println("Starte Download");
             }
             #ifdef ESP8266
-            ESPhttpUpdate.rebootOnUpdate(false);// reboot abschalten, wir wollen erst Meldungen ausgeben
+            // Suppress Reboot on Update for beeing able to read messages first
+            ESPhttpUpdate.rebootOnUpdate(false);
             t_httpUpdate_return ret = ESPhttpUpdate.update(config.binary_url);
             #else
-            httpUpdate.rebootOnUpdate(false);// reboot abschalten, wir wollen erst Meldungen ausgeben
+            // Suppress Reboot on Update for beeing able to read messages first
+            httpUpdate.rebootOnUpdate(false);
             t_httpUpdate_return ret = httpUpdate.update( client, config.binary_url );
             #endif
             switch (ret)
