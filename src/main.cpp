@@ -137,12 +137,12 @@ void setup() {
   {
       //not initialized
       cfg.magic = 1337;
-      cfg.initialized = 0;
+      cfg.initialized = 1;
       strncpy(cfg.SSID, WIFI_SSID, sizeof(WIFI_SSID));
       strncpy(cfg.password, WIFI_PASS, sizeof(WIFI_PASS));
       cfg.ota_update_enable = 1;
       cfg.auto_update_enable = 1;
-      cfg.firmwareVer = 0;
+      cfg.firmwareVer = 1;
       strncpy(cfg.version_info_url, URL_Version_Info_Default, sizeof(URL_Version_Info_Default));
       strncpy(cfg.version_update_url, URL_Firmware_Default, sizeof(URL_Firmware_Default));
       strncpy(cfg.hostname, HOSTNAME, sizeof(HOSTNAME));
