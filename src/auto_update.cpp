@@ -46,7 +46,11 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         {
             Serial.println("Redirection to : " + httpLocation);
             HTTPClient http;
+            #ifdef ESP8266
+            http.begin(httpLocation);
+            #else
             http.begin(client, httpLocation);
+            #endif
             httpCode = http.GET();
             httpLocation = http.getLocation();
         }
