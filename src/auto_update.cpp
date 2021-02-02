@@ -63,11 +63,15 @@ void FirmwareUpdate(OTA_CONFIG config, void (*onUpdateDoneCallback)(unsigned int
         // If Response is OK (200)
         if (httpCode == HTTP_CODE_OK)
         {
+            DynamicJsonDocument doc(8192);
             // Read String from Website
             String payload = http.getString();
-            Serial.println("Version found online: " + String(payload));
+            // Serial.println("Payload: " + String(payload));
+            deserializeJson(doc, payload);
+            const char* tag_name = doc["tag_name"];
             // Cast Integer of Payload
-            firmwareVersionNew = payload.toInt();
+            firmwareVersionNew =  String(tag_name).toInt();
+            Serial.println("Version: " + String(firmwareVersionNew));
         }
         else
         {
